@@ -26,8 +26,17 @@ async function run() {
     await client.connect();
 
     const officeCollection = client.db("JobEntry").collection("office");
+
+    // this is for question collection
+    const quesCollection = client.db("JobEntry").collection("ques");
+
     app.get("/office", async (req, res) => {
       const result = await officeCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/ques", async (req, res) => {
+      const result = await quesCollection.find().toArray();
       res.send(result);
     });
 
