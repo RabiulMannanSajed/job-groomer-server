@@ -29,6 +29,8 @@ async function run() {
 
     // this is for question collection
     const quesCollection = client.db("JobEntry").collection("ques");
+    // take the user info
+    const userApplyInfoCollection = client.db("JobEntry").collection("apply");
 
     app.get("/office", async (req, res) => {
       const result = await officeCollection.find().toArray();
@@ -40,6 +42,12 @@ async function run() {
       res.send(result);
     });
 
+    // take the use info form client site
+    app.post("/apply", async (req, res) => {
+      const userInfo = req.body;
+      const result = await userApplyInfoCollection.insertOne(userInfo);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
