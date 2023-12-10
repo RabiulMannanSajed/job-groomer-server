@@ -27,6 +27,9 @@ async function run() {
 
     const officeCollection = client.db("JobEntry").collection("office");
 
+    // this is for users
+    const usersCollection = client.db("JobEntry").collection("office");
+
     // this is for question collection
     const quesCollection = client.db("JobEntry").collection("ques");
     // take the user info
@@ -39,6 +42,13 @@ async function run() {
 
     app.get("/ques", async (req, res) => {
       const result = await quesCollection.find().toArray();
+      res.send(result);
+    });
+
+    //this is the post method of user info take data form user
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
       res.send(result);
     });
 
