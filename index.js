@@ -35,7 +35,7 @@ async function run() {
     const quesCollection = client.db("JobEntry").collection("ques");
     // take the user info
     const userApplyInfoCollection = client.db("JobEntry").collection("apply");
-    const commentCollection = client.db("JobEntry").collection("comment");
+    const commentCollection = client.db("JobEntry").collection("talk");
     const tutorialCollection = client.db("JobEntry").collection("tutorial");
 
     app.get("/office", async (req, res) => {
@@ -51,6 +51,13 @@ async function run() {
       const result = await quesCollection.find().toArray();
       res.send(result);
     });
+    // this is for que Post /* TODO : take data form client site  */
+    app.post("/ques", async (req, res) => {
+      const que = req.body;
+      const result = await quesCollection.insertOne(que);
+      res.send(result);
+    });
+
     app.get("/tutorial", async (req, res) => {
       const result = await tutorialCollection.find().toArray();
       res.send(result);
@@ -74,11 +81,11 @@ async function run() {
     });
 
     // comment
-    app.get("/comment", async (req, res) => {
+    app.get("/talk", async (req, res) => {
       const result = await commentCollection.find().toArray();
       res.send(result);
     });
-    app.post("/comment", async (req, res) => {
+    app.post("/talk", async (req, res) => {
       const comment = req.body;
       const result = await commentCollection.insertOne(comment);
       res.send(result);
@@ -113,31 +120,19 @@ async function run() {
       }
     });
     //make user admin and office woner test
-    app.patch("/users/admin/:id", async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          role: "admin",
-          officeName: "olloy",
-        },
-      };
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    });
-
-    // // this is for  update single user amd make him admin
     // app.patch("/users/admin/:id", async (req, res) => {
     //   const id = req.params.id;
     //   const filter = { _id: new ObjectId(id) };
     //   const updateDoc = {
     //     $set: {
     //       role: "admin",
+    //       officeName: "",
     //     },
     //   };
     //   const result = await usersCollection.updateOne(filter, updateDoc);
     //   res.send(result);
     // });
+
     // make the user admin of his office
     app.patch("/users/updateProfile/:id", async (req, res) => {
       const id = req.params.id;
@@ -152,12 +147,26 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
-    app.patch("/users/officeName/:id", async (req, res) => {
+
+    // this is for  update single user amd make him admin
+    app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
-          officeName: "olloy",
+          role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    app.patch("/users/officeName/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const { officeName } = req.body;
+      const updateDoc = {
+        $set: {
+          officeName: officeName,
         },
       };
       const result = await usersCollection.updateOne(filter, updateDoc);
@@ -171,7 +180,36 @@ async function run() {
       res.send(result);
     });
 
-    // take the use info form client site
+    // take the use info form client site applier info
+    app.get("/apply", async (req, res) => {
+      const result = await userApplyInfoCollection.find().toArray();
+      res.send(result);
+    });
+
+    //  update the user he is hired
+    app.patch("/apply/hire/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          hire: "hire",
+        },
+      };
+      const result = await userApplyInfoCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    app.patch("/apply/reject/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          hire: "reject",
+        },
+      };
+      const result = await userApplyInfoCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     app.post("/apply", async (req, res) => {
       const userInfo = req.body;
       const result = await userApplyInfoCollection.insertOne(userInfo);
@@ -183,8 +221,6 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
   }
 }
 run().catch(console.dir);
