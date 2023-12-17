@@ -68,6 +68,15 @@ async function run() {
       const result = await tutorialCollection.insertOne(t);
       res.send(result);
     });
+    // delete video
+
+    app.delete("/tutorial/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tutorialCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // to see all users
     app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -90,47 +99,35 @@ async function run() {
       const result = await commentCollection.insertOne(comment);
       res.send(result);
     });
-    // tutorial
-    const storage = multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, "public/pdf");
-      },
-      filename: (req, file, cb) => {
-        cb(
-          null,
-          file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-        );
-      },
-    });
-    const upload = multer({
-      storage: storage,
-    });
-    app.post("/upload", upload.single("file"), (req, res) => {
-      console.log(req.file);
-    });
-    app.get("/pdf/:filename", async (req, res) => {
-      const fileName = req.params.filename;
-      const filePath = path.join(__dirname, "public/pdf", fileName);
 
-      // Check if the file exists before sending
-      if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-      } else {
-        res.status(404).json({ error: "File not found" });
-      }
-    });
-    //make user admin and office woner test
-    // app.patch("/users/admin/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const filter = { _id: new ObjectId(id) };
-    //   const updateDoc = {
-    //     $set: {
-    //       role: "admin",
-    //       officeName: "",
-    //     },
-    //   };
-    //   const result = await usersCollection.updateOne(filter, updateDoc);
-    //   res.send(result);
+    // tutorial
+    // const storage = multer.diskStorage({
+    //   destination: (req, file, cb) => {
+    //     cb(null, "public/pdf");
+    //   },
+    //   filename: (req, file, cb) => {
+    //     cb(
+    //       null,
+    //       file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    //     );
+    //   },
+    // });
+    // const upload = multer({
+    //   storage: storage,
+    // });
+    // app.post("/upload", upload.single("file"), (req, res) => {
+    //   console.log(req.file);
+    // });
+    // app.get("/pdf/:filename", async (req, res) => {
+    //   const fileName = req.params.filename;
+    //   const filePath = path.join(__dirname, "public/pdf", fileName);
+
+    //   // Check if the file exists before sending
+    //   if (fs.existsSync(filePath)) {
+    //     res.sendFile(filePath);
+    //   } else {
+    //     res.status(404).json({ error: "File not found" });
+    //   }
     // });
 
     // make the user admin of his office
